@@ -1,0 +1,18 @@
+= Cheatsheets
+
+[[Product]]
+== Product
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[image]]`@image`|`String`|-
+|[[name]]`@name`|`String`|-
+|[[price]]`@price`|`Number (double)`|-
+|[[productId]]`@productId`|`Number (int)`|-
+|[[sellerId]]`@sellerId`|`Number (int)`|-
+|[[type]]`@type`|`String`|-
+|===
+

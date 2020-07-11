@@ -1,0 +1,16 @@
+{
+  "http.address": "0.0.0.0",
+  "http.port": 9000,
+  "service-discovery": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "key": "records"
+  },
+  "circuit-breaker": {
+    "name": "circuit-breaker",
+    "max-failures": 5,
+    "timeout": 2000,
+    "fallback-on-failure": true,
+    "reset-timeout": 10000
+  }
+}
