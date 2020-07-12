@@ -9,8 +9,10 @@
 
 rootProject.name = 'holi-express'
 include 'holi-express-common'
+include 'stock-microservice'
 include 'product-microservice'
 include 'user-microservice'
 include 'order-microservice'
 include 'api-gateway'
+include 'authentication-microservice'
 

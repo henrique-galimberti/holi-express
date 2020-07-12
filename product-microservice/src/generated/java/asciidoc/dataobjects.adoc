@@ -8,10 +8,10 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[id]]`@id`|`Number (int)`|-
 |[[image]]`@image`|`String`|-
 |[[name]]`@name`|`String`|-
 |[[price]]`@price`|`Number (double)`|-
-|[[productId]]`@productId`|`Number (int)`|-
 |[[sellerId]]`@sellerId`|`Number (int)`|-
 |[[type]]`@type`|`String`|-
 |===

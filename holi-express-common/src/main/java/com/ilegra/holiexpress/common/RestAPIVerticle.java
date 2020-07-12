@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.function.Function;
+
 public class RestAPIVerticle extends BaseMicroserviceVerticle {
 
     protected Future<Void> createHttpServer(Router router, String host, int port) {
@@ -23,6 +25,24 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
         return asyncResult -> {
             if (asyncResult.succeeded()) {
                 handler.handle(asyncResult.result());
+            } else {
+                handleInternalError(context, asyncResult.cause());
+                asyncResult.cause().printStackTrace();
+            }
+        };
+    }
+
+    protected <T> Handler<AsyncResult<T>> resultHandler(RoutingContext context, Function<T, String> converter) {
+        return asyncResult -> {
+            if (asyncResult.succeeded()) {
+                T res = asyncResult.result();
+                if (res == null) {
+                    handleInternalError(context, new Exception("Invalid result"));
+                } else {
+                    context.response()
+                            .putHeader("content-type", "application/json")
+                            .end(converter.apply(res));
+                }
             } else {
                 handleInternalError(context, asyncResult.cause());
                 asyncResult.cause().printStackTrace();

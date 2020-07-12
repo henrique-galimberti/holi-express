@@ -6,7 +6,7 @@ import io.vertx.core.json.JsonObject;
 @DataObject(generateConverter = true)
 public class Product {
 
-    private int productId;
+    private int id;
     private int sellerId;
     private String name;
     private double price = 0.0d;
@@ -17,7 +17,7 @@ public class Product {
     }
 
     public Product(Product other) {
-        this.productId = other.productId;
+        this.id = other.id;
         this.sellerId = other.sellerId;
         this.name = other.name;
         this.price = other.price;
@@ -35,12 +35,12 @@ public class Product {
         return json;
     }
 
-    public int getProductId() {
-        return productId;
+    public int getId() {
+        return id;
     }
 
-    public Product setProductId(int productId) {
-        this.productId = productId;
+    public Product setId(int id) {
+        this.id = id;
         return this;
     }
 
@@ -96,12 +96,12 @@ public class Product {
 
         Product product = (Product) o;
 
-        return productId == product.productId && sellerId == product.sellerId;
+        return id == product.id;
     }
 
     @Override
     public int hashCode() {
-        return productId;
+        return id;
     }
 
     @Override

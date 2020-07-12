@@ -17,7 +17,7 @@ public class BaseJdbcService {
         this.client = JDBCClient.create(vertx, config.getJsonObject("jdbc-config"));
     }
 
-    protected void executeCommand(JsonArray params, String sql, Handler<AsyncResult<Void>> resultHandler) {
+    protected void execute(JsonArray params, String sql, Handler<AsyncResult<Void>> resultHandler) {
         client.getConnection(connHandler(resultHandler, connection -> connection.updateWithParams(sql, params, r -> {
             if (r.succeeded()) {
                 resultHandler.handle(Future.succeededFuture());
@@ -26,6 +26,22 @@ public class BaseJdbcService {
             }
             connection.close();
         })));
+    }
+
+    protected Future<JsonArray> insert(JsonArray params, String sql) {
+        return getConnection()
+                .compose(connection -> {
+                    Promise<JsonArray> promise = Promise.promise();
+                    connection.updateWithParams(sql, params, queryResultHandler -> {
+                        if (queryResultHandler.succeeded()) {
+                            promise.complete(queryResultHandler.result().getKeys());
+                        } else {
+                            promise.fail(queryResultHandler.cause());
+                        }
+                        connection.close();
+                    });
+                    return promise.future();
+                });
     }
 
     protected <K> Future<Optional<JsonObject>> fetchOne(K param, String sql) {
@@ -54,6 +70,7 @@ public class BaseJdbcService {
             Promise<List<JsonObject>> promise = Promise.promise();
             connection.query(sql, queryResultHandler -> {
                 if (queryResultHandler.succeeded()) {
+                    System.out.println(queryResultHandler.result().getRows());
                     promise.complete(queryResultHandler.result().getRows());
                 } else {
                     promise.fail(queryResultHandler.cause());

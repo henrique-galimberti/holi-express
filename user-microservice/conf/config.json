@@ -1,0 +1,11 @@
+{
+  "api.name": "user",
+  "http.address": "0.0.0.0",
+  "http.port": 9002,
+  "jdbc-config": {
+    "url": "jdbc:postgresql://localhost:5432/holiexpress",
+    "driver_class": "org.postgresql.Driver",
+    "user": "postgres",
+    "password": "postgre"
+  }
+}

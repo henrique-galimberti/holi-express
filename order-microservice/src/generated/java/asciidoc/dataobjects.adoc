@@ -1,0 +1,15 @@
+= Cheatsheets
+
+[[Order]]
+== Order
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[buyerId]]`@buyerId`|`Number (int)`|-
+|[[id]]`@id`|`Number (int)`|-
+|[[productId]]`@productId`|`Number (int)`|-
+|===
+

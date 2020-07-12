@@ -14,6 +14,11 @@ public class ProductConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, Product obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "id":
+          if (member.getValue() instanceof Number) {
+            obj.setId(((Number)member.getValue()).intValue());
+          }
+          break;
         case "image":
           if (member.getValue() instanceof String) {
             obj.setImage((String)member.getValue());
@@ -27,11 +32,6 @@ public class ProductConverter {
         case "price":
           if (member.getValue() instanceof Number) {
             obj.setPrice(((Number)member.getValue()).doubleValue());
-          }
-          break;
-        case "productId":
-          if (member.getValue() instanceof Number) {
-            obj.setProductId(((Number)member.getValue()).intValue());
           }
           break;
         case "sellerId":
@@ -53,6 +53,7 @@ public class ProductConverter {
   }
 
   public static void toJson(Product obj, java.util.Map<String, Object> json) {
+    json.put("id", obj.getId());
     if (obj.getImage() != null) {
       json.put("image", obj.getImage());
     }
@@ -60,7 +61,6 @@ public class ProductConverter {
       json.put("name", obj.getName());
     }
     json.put("price", obj.getPrice());
-    json.put("productId", obj.getProductId());
     json.put("sellerId", obj.getSellerId());
     if (obj.getType() != null) {
       json.put("type", obj.getType());

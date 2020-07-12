@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface ProductService {
 
-    String SERVICE_ADDRESS = "service.product";
-
     void initializePersistence(Handler<AsyncResult<Void>> resultHandler);
 
     void addProduct(Product product, Handler<AsyncResult<Void>> resultHandler);

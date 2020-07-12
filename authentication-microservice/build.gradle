@@ -4,7 +4,7 @@ plugins {
 }
 
 vertx {
-    mainVerticle = 'com.ilegra.holiexpress.user.UserVerticle'
+    mainVerticle = 'com.ilegra.holiexpress.authentication.AuthenticationVerticle'
     config = "${projectDir}/conf/config.json"
 }
 

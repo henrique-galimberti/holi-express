@@ -1,7 +1,7 @@
 package com.ilegra.holiexpress.product;
 
 import com.ilegra.holiexpress.common.BaseMicroserviceVerticle;
-import com.ilegra.holiexpress.product.api.RestProductAPIVerticle;
+import com.ilegra.holiexpress.product.api.ProductRestAPIVerticle;
 import com.ilegra.holiexpress.product.service.ProductService;
 import com.ilegra.holiexpress.product.service.ProductServiceImpl;
 import io.vertx.core.DeploymentOptions;
@@ -23,7 +23,7 @@ public class ProductVerticle extends BaseMicroserviceVerticle {
 
     private Future<Void> deployRestService(ProductService service) {
         Promise<String> promise = Promise.promise();
-        vertx.deployVerticle(new RestProductAPIVerticle(service),
+        vertx.deployVerticle(new ProductRestAPIVerticle(service),
                 new DeploymentOptions().setConfig(config()),
                 promise);
         return promise.future().map((Void) null);
