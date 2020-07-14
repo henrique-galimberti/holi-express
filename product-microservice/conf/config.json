@@ -1,7 +1,12 @@
 {
   "api.name": "product",
   "http.address": "0.0.0.0",
-  "http.port": 9001,
+  "http.port": 9003,
+  "service-discovery": {
+    "host": "localhost",
+    "port": 6379,
+    "key": "records"
+  },
   "jdbc-config": {
     "url": "jdbc:postgresql://localhost:5432/holiexpress",
     "driver_class": "org.postgresql.Driver",

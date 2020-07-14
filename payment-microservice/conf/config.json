@@ -1,7 +1,7 @@
 {
-  "api.name": "order",
+  "api.name": "payment",
   "http.address": "0.0.0.0",
-  "http.port": 9001,
+  "http.port": 9002,
   "service-discovery": {
     "host": "localhost",
     "port": 6379,

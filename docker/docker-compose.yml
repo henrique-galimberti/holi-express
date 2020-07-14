@@ -1,0 +1,57 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:latest
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_DB: holiexpress
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgre
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"
+  order-microservice:
+    image: holi-express/order-order
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - "9001"
+  payment-microservice:
+    image: holi-express/payment-microservice
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - "9002"
+  product-microservice:
+    image: holi-express/product-microservice
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - "9003"
+  stock-microservice:
+    image: holi-express/stock-microservice
+    depends_on:
+      - redis
+    expose:
+      - "9004"
+  user-microservice:
+    image: holi-express/user-microservice
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - "9005"
+  api-gateway:
+    image: holi-express/api-gateway
+    ports:
+      - "9000:9000"
+    environment:
+      - JAVA_OPTS="-Xms128m -Xmx256m"
+    depends_on:
+      - postgres
+      - redis

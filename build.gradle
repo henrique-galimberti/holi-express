@@ -19,6 +19,11 @@ subprojects {
     }
 }
 
-task run {
-    
+task buildFatJars {
+    dependsOn ':api-gateway:jar'
+    dependsOn ':order-microservice:jar'
+    dependsOn ':payment-microservice:jar'
+    dependsOn ':product-microservice:jar'
+    dependsOn ':stock-microservice:jar'
+    dependsOn ':user-microservice:jar'
 }
