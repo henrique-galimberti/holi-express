@@ -1,8 +1,11 @@
 package com.ilegra.holiexpress.common.service;
 
+import com.ilegra.holiexpress.common.BaseMicroserviceVerticle;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
 
@@ -10,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class BaseJdbcService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseMicroserviceVerticle.class);
 
     protected final JDBCClient client;
 
@@ -22,6 +27,7 @@ public class BaseJdbcService {
             if (r.succeeded()) {
                 resultHandler.handle(Future.succeededFuture());
             } else {
+                LOGGER.error("Failed to execute query", r.cause());
                 resultHandler.handle(Future.failedFuture(r.cause()));
             }
             connection.close();
@@ -36,6 +42,7 @@ public class BaseJdbcService {
                         if (queryResultHandler.succeeded()) {
                             promise.complete(queryResultHandler.result().getKeys());
                         } else {
+                            LOGGER.error("Failed to execute insert", queryResultHandler.cause());
                             promise.fail(queryResultHandler.cause());
                         }
                         connection.close();
@@ -57,6 +64,7 @@ public class BaseJdbcService {
                                 promise.complete(Optional.of(rows.get(0)));
                             }
                         } else {
+                            LOGGER.error("Failed to fetch query result", queryResultHandler.cause());
                             promise.fail(queryResultHandler.cause());
                         }
                         connection.close();
@@ -73,6 +81,7 @@ public class BaseJdbcService {
                     System.out.println(queryResultHandler.result().getRows());
                     promise.complete(queryResultHandler.result().getRows());
                 } else {
+                    LOGGER.error("Failed to fetch query result", queryResultHandler.cause());
                     promise.fail(queryResultHandler.cause());
                 }
                 connection.close();
@@ -89,6 +98,7 @@ public class BaseJdbcService {
                     System.out.println(queryResultHandler.result().getRows());
                     promise.complete(queryResultHandler.result().getRows());
                 } else {
+                    LOGGER.error("Failed to fetch query result", queryResultHandler.cause());
                     promise.fail(queryResultHandler.cause());
                 }
                 connection.close();
@@ -97,26 +107,13 @@ public class BaseJdbcService {
         });
     }
 
-    protected <K> void delete(K id, String sql, Handler<AsyncResult<Void>> resultHandler) {
-        client.getConnection(connHandler(resultHandler, connection -> {
-            JsonArray params = new JsonArray().add(id);
-            connection.updateWithParams(sql, params, r -> {
-                if (r.succeeded()) {
-                    resultHandler.handle(Future.succeededFuture());
-                } else {
-                    resultHandler.handle(Future.failedFuture(r.cause()));
-                }
-                connection.close();
-            });
-        }));
-    }
-
     protected <R> Handler<AsyncResult<SQLConnection>> connHandler(Handler<AsyncResult<R>> failureHandler, Handler<SQLConnection> successHandler) {
         return conn -> {
             if (conn.succeeded()) {
                 final SQLConnection connection = conn.result();
                 successHandler.handle(connection);
             } else {
+                LOGGER.error("Failed to establish connection to jdbc", conn.cause());
                 failureHandler.handle(Future.failedFuture(conn.cause()));
             }
         };

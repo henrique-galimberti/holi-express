@@ -10,6 +10,8 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.web.Router;
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class APIGatewayVerticle extends RestAPIVerticle {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(APIGatewayVerticle.class);
 
     private JDBCAuth authProvider;
 
@@ -103,6 +107,7 @@ public class APIGatewayVerticle extends RestAPIVerticle {
                     command.complete();
                 }
             } else {
+                LOGGER.error(asyncResult.cause());
                 command.fail(asyncResult.cause());
             }
         })).onComplete(asyncResult -> {

@@ -46,8 +46,12 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
                 .add(product.getImage())
                 .add(product.getType());
         insert(params, INSERT_STATEMENT).onComplete(asyncResult -> {
-            product.setId(asyncResult.result().getInteger(0));
-            resultHandler.handle(Future.succeededFuture());
+            if (asyncResult.succeeded()) {
+                product.setId(asyncResult.result().getInteger(0));
+                resultHandler.handle(Future.succeededFuture());
+            } else {
+                resultHandler.handle(Future.failedFuture(asyncResult.cause()));
+            }
         });
     }
 

@@ -6,6 +6,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
@@ -14,6 +16,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class RestAPIVerticle extends BaseMicroserviceVerticle {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestAPIVerticle.class);
 
     protected Future<Void> createHttpServer(Router router, String host, int port) {
         Promise<HttpServer> promise = Promise.promise();
@@ -29,6 +33,7 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
         if (principal.isPresent()) {
             biHandler.accept(context, principal.get());
         } else {
+            LOGGER.warn("Unauthenticated Request");
             context.response()
                     .setStatusCode(401)
                     .end(new JsonObject().put("message", "need_auth").encode());
@@ -82,20 +87,8 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
         };
     }
 
-    protected Handler<AsyncResult<Void>> deleteResultHandler(RoutingContext context) {
-        return asyncResult -> {
-            if (asyncResult.succeeded()) {
-                context.response().setStatusCode(204)
-                        .putHeader("content-type", "application/json")
-                        .end(new JsonObject().put("message", "delete_success").encodePrettily());
-            } else {
-                handleInternalError(context, asyncResult.cause());
-                asyncResult.cause().printStackTrace();
-            }
-        };
-    }
-
     protected void handleBadRequest(RoutingContext context, Throwable ex) {
+        LOGGER.warn(ex.getMessage(), ex);
         context.response().setStatusCode(400)
                 .putHeader("content-type", "application/json")
                 .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
@@ -108,12 +101,14 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
     }
 
     protected void handleInternalError(RoutingContext context, Throwable ex) {
+        LOGGER.error(ex.getMessage(), ex);
         context.response().setStatusCode(500)
                 .putHeader("content-type", "application/json")
                 .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
     }
 
     protected void handleBadGateway(Throwable ex, RoutingContext context) {
+        LOGGER.error(ex.getMessage(), ex);
         context.response()
                 .setStatusCode(502)
                 .putHeader("content-type", "application/json")
