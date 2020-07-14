@@ -160,7 +160,7 @@ That being said, there are several features that were not addressed in this solu
 ![payment-microservice](https://progress-bar.dev/80?title=payment-microservice)
 ![authorization-service](https://progress-bar.dev/100?title=authorization-service)
 ![redis-cache](https://progress-bar.dev/0?title=redis-cache)
-![docker](https://progress-bar.dev/0?title=docker)
+![docker](https://progress-bar.dev/80?title=docker)
 ![logging](https://progress-bar.dev/100?title=logging)
 ![monitoring](https://progress-bar.dev/0?title=monitoring)
 ![tests](https://progress-bar.dev/0?title=tests)
