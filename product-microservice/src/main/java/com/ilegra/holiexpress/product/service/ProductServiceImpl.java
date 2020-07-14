@@ -2,14 +2,11 @@ package com.ilegra.holiexpress.product.service;
 
 import com.ilegra.holiexpress.common.service.BaseJdbcService;
 import com.ilegra.holiexpress.product.entity.Product;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProductServiceImpl extends BaseJdbcService implements ProductService {
@@ -25,7 +22,7 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
     private static final String INSERT_STATEMENT = "INSERT INTO products (\"sellerId\", name, price, image, type) VALUES (?, ?, ?, ?, ?)";
     private static final String FETCH_STATEMENT = "SELECT * FROM products WHERE id = ?";
     private static final String FETCH_ALL_STATEMENT = "SELECT * FROM products";
-    private static final String DELETE_STATEMENT = "DELETE FROM products WHERE id = ?";
+    private static final String COMPARE_STATEMENT = "SELECT * FROM products WHERE type = ? and price < ? and id <> ? limit 500";
 
     public ProductServiceImpl(Vertx vertx, JsonObject config) {
         super(vertx, config);
@@ -33,12 +30,11 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
 
     @Override
     public void initializePersistence(Handler<AsyncResult<Void>> resultHandler) {
-        client.getConnection(connHandler(resultHandler, connection -> {
-            connection.execute(CREATE_STATEMENT, r -> {
-                resultHandler.handle(r);
-                connection.close();
-            });
-        }));
+        client.getConnection(connHandler(resultHandler,
+                connection -> connection.execute(CREATE_STATEMENT, r -> {
+                    resultHandler.handle(r);
+                    connection.close();
+                })));
     }
 
     @Override
@@ -73,7 +69,51 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
     }
 
     @Override
-    public void deleteProduct(String productId, Handler<AsyncResult<Void>> resultHandler) {
-        this.delete(Integer.parseInt(productId), DELETE_STATEMENT, resultHandler);
+    public void compareSimilarProducts(Product product, Handler<AsyncResult<List<Product>>> resultHandler) {
+        this.fetchMany(new JsonArray()
+                .add(product.getType())
+                .add(product.getPrice())
+                .add(product.getId()), COMPARE_STATEMENT)
+                .map(rawList -> rawList.stream()
+                        .map(Product::new)
+                        .collect(Collectors.toList())
+                )
+                .onComplete(asyncResult -> {
+                    if (asyncResult.succeeded()) {
+                        Promise<List<Product>> promise = Promise.promise();
+
+                        List<String> referenceWords = Arrays.asList(product.getName().split(" "));
+
+                        Map<Integer, Integer> mapCountMatchingWords = asyncResult.result()
+                                .stream()
+                                .collect(Collectors.toMap(Product::getId, p -> {
+                                    List<String> tempReferenceWords = new ArrayList<>(referenceWords);
+
+                                    wordsLoop:
+                                    for (String word : p.getName().split(" ")) {
+                                        for (Iterator<String> it = tempReferenceWords.iterator(); it.hasNext(); ) {
+                                            if (it.next().toLowerCase().equals(word.toLowerCase())) {
+                                                it.remove();
+                                                continue wordsLoop;
+                                            }
+                                        }
+                                    }
+
+                                    return referenceWords.size() - tempReferenceWords.size();
+                                }));
+
+                        List<Product> similarProducts = asyncResult.result()
+                                .stream()
+                                .sorted(Comparator.comparing(p -> mapCountMatchingWords.get(p.getId())))
+                                .limit(10)
+                                .collect(Collectors.toList());
+
+                        promise.complete(similarProducts);
+
+                        resultHandler.handle(promise.future());
+                    } else {
+                        resultHandler.handle(asyncResult);
+                    }
+                });
     }
 }

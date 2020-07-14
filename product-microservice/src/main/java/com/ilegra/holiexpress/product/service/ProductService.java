@@ -16,5 +16,5 @@ public interface ProductService {
 
     void retrieveAllProducts(Handler<AsyncResult<List<Product>>> resultHandler);
 
-    void deleteProduct(String productId, Handler<AsyncResult<Void>> resultHandler);
+    void compareSimilarProducts(Product product, Handler<AsyncResult<List<Product>>> resultHandler);
 }

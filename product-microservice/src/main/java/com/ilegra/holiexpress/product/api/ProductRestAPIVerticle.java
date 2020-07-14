@@ -18,6 +18,7 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
     private static final String API_ADD = "/add";
     private static final String API_RETRIEVE_ALL = "/retrieveAll";
     private static final String API_RETRIEVE = "/retrieve/:id";
+    private static final String API_COMPARE = "/compare";
 
     private final ProductService service;
 
@@ -35,6 +36,7 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
         router.post(API_ADD).handler(context -> requireLogin(context, this::apiAdd));
         router.get(API_RETRIEVE_ALL).handler(this::apiRetrieveAll);
         router.get(API_RETRIEVE).handler(this::apiRetrieve);
+        router.get(API_COMPARE).handler(this::apiCompareSimilarProducts);
 
         String host = config().getString("http.address", "0.0.0.0");
         int port = config().getInteger("http.port", 9000);
@@ -46,6 +48,7 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
 
     private void apiAdd(RoutingContext context, JsonObject userPrincipal) {
         try {
+            //TODO verify if sellerId matches userPrincipal
             Product product = new Product(new JsonObject(context.getBodyAsString()));
             service.addProduct(product, resultHandler(context, r -> {
                 String result = new JsonObject().put("message", "product_added")
@@ -67,5 +70,14 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
 
     private void apiRetrieveAll(RoutingContext context) {
         service.retrieveAllProducts(resultHandler(context, Json::encodePrettily));
+    }
+
+    private void apiCompareSimilarProducts(RoutingContext context) {
+        try {
+            Product product = new Product(new JsonObject(context.getBodyAsString()));
+            service.compareSimilarProducts(product, resultHandler(context, Json::encodePrettily));
+        } catch (DecodeException e) {
+            handleBadRequest(context, e);
+        }
     }
 }
