@@ -13,7 +13,7 @@ services:
     expose:
       - "6379"
   order-microservice:
-    image: holi-express/order-order
+    image: holi-express/order-microservice
     depends_on:
       - postgres
       - redis
