@@ -17,11 +17,68 @@ The stack used in this project contains:
 * Java
 * Vert.x
 * PostgreSQL
-* Redis (kind of pending)
+* Redis
 * Gradle
-* JUnit (pending)
-* Docker (pending)
+* JUnit
+* Docker
 
+## Usage (Base Requirements + User Stories)
+#### Register user (Base Requirement):
+REQUEST:
+```sh
+POST /api/user/add HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "henrique.galimberti",
+    "password": "123456",
+    "name": "Henrique Galimberti"
+}
+```
+RESPONSE:
+```sh
+body:
+{
+  "message": "user_added",
+  "id": 5
+}
+```
+#### Register product (Base Requirement):
+
+#### Buy product (Base Requirement):
+
+#### Compare prices (User Story #2):
+
+#### Authentication (User Story #5):
+REQUEST:
+```sh
+POST /auth HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "henrique.galimberti",
+    "password": "123456"
+}
+```
+RESPONSE (success):
+```sh
+set-cookie vertx-web.session=061a8bde735fe29274fe4a4533a9d8f8; Path=/
+
+{
+  "message" : "authentication_success",
+  "user-principal" : {
+    "username" : "henrique.galimberti"
+  }
+}
+```
+RESPONSE (failure):
+```sh
+
+body:
+{
+  "error": "Invalid username/password"
+}
+```
 ## Progress
 ![api-gateway](https://progress-bar.dev/90?title=api-gateway)
 ![product-microservice](https://progress-bar.dev/80?title=product-microservice)

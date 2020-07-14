@@ -2,10 +2,5 @@
   "api.name": "stock",
   "http.address": "0.0.0.0",
   "http.port": 9003,
-  "jdbc-config": {
-    "url": "jdbc:postgresql://localhost:5432/holiexpress",
-    "driver_class": "org.postgresql.Driver",
-    "user": "postgres",
-    "password": "postgre"
-  }
+  "redis-connection": "redis://localhost:6379"
 }

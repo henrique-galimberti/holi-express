@@ -18,7 +18,6 @@ public class UserRestAPIVerticle extends RestAPIVerticle {
     private static final String API_ADD = "/add";
     private static final String API_RETRIEVE_ALL = "/retrieveAll";
     private static final String API_RETRIEVE = "/retrieve/:id";
-    private static final String API_DELETE = "/delete/:id";
 
     private final UserService service;
 
@@ -36,7 +35,6 @@ public class UserRestAPIVerticle extends RestAPIVerticle {
         router.post(API_ADD).handler(this::apiAdd);
         router.get(API_RETRIEVE_ALL).handler(this::apiRetrieveAll);
         router.get(API_RETRIEVE).handler(this::apiRetrieve);
-        router.delete(API_DELETE).handler(this::apiDelete);
 
         String host = config().getString("http.address", "0.0.0.0");
         int port = config().getInteger("http.port", 9000);
@@ -62,6 +60,42 @@ public class UserRestAPIVerticle extends RestAPIVerticle {
         }
     }
 
+//    private void apiAdd(RoutingContext context) {
+//        try {
+//            User user = new User(new JsonObject(context.getBodyAsString()));
+//
+//            getAuthEndpoint().future().onComplete(asyncResult -> {
+//                HttpClient client = asyncResult.result();
+//
+//                HttpClientRequest request = client.request(HttpMethod.POST, "/hash", response -> {
+//                    if (response.statusCode() == 200) {
+//                        response.bodyHandler(buffer -> {
+//                            JsonObject hashedPassword = new JsonObject(buffer.toString());
+//                            user.setPassword(hashedPassword.getString("password"));
+//                            user.setPassword_salt(hashedPassword.getString("password_salt"));
+//
+//                            service.addUser(user, resultHandler(context, r -> {
+//                                String result = new JsonObject().put("message", "user_added")
+//                                        .put("id", user.getId())
+//                                        .encodePrettily();
+//                                context.response().setStatusCode(201)
+//                                        .putHeader("content-type", "application/json")
+//                                        .end(result);
+//                            }));
+//
+//                            ServiceDiscovery.releaseServiceObject(discovery, client);
+//                        });
+//                    }
+//                });
+//
+//                request.end(new JsonObject().put("password", user.getPassword()).encodePrettily());
+//            });
+//
+//        } catch (DecodeException e) {
+//            handleBadRequest(context, e);
+//        }
+//    }
+
     private void apiRetrieve(RoutingContext context) {
         String userId = context.request().getParam("id");
         service.retrieveUser(userId, resultHandlerNonEmpty(context));
@@ -69,10 +103,5 @@ public class UserRestAPIVerticle extends RestAPIVerticle {
 
     private void apiRetrieveAll(RoutingContext context) {
         service.retrieveAllUsers(resultHandler(context, Json::encodePrettily));
-    }
-
-    private void apiDelete(RoutingContext context) {
-        String userId = context.request().getParam("id");
-        service.deleteUser(userId, deleteResultHandler(context));
     }
 }

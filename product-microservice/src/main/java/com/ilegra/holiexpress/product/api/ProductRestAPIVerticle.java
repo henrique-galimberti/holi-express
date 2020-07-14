@@ -18,7 +18,6 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
     private static final String API_ADD = "/add";
     private static final String API_RETRIEVE_ALL = "/retrieveAll";
     private static final String API_RETRIEVE = "/retrieve/:id";
-    private static final String API_DELETE = "/delete/:id";
 
     private final ProductService service;
 
@@ -33,10 +32,9 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
 
         router.route().handler(BodyHandler.create());
 
-        router.post(API_ADD).handler(this::apiAdd);
+        router.post(API_ADD).handler(context -> requireLogin(context, this::apiAdd));
         router.get(API_RETRIEVE_ALL).handler(this::apiRetrieveAll);
         router.get(API_RETRIEVE).handler(this::apiRetrieve);
-        router.delete(API_DELETE).handler(this::apiDelete);
 
         String host = config().getString("http.address", "0.0.0.0");
         int port = config().getInteger("http.port", 9000);
@@ -46,7 +44,7 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
                 .onComplete(endpointPublished -> startPromise.complete());
     }
 
-    private void apiAdd(RoutingContext context) {
+    private void apiAdd(RoutingContext context, JsonObject userPrincipal) {
         try {
             Product product = new Product(new JsonObject(context.getBodyAsString()));
             service.addProduct(product, resultHandler(context, r -> {
@@ -69,10 +67,5 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
 
     private void apiRetrieveAll(RoutingContext context) {
         service.retrieveAllProducts(resultHandler(context, Json::encodePrettily));
-    }
-
-    private void apiDelete(RoutingContext context) {
-        String productId = context.request().getParam("id");
-        service.deleteProduct(productId, deleteResultHandler(context));
     }
 }

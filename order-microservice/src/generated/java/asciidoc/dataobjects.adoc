@@ -11,5 +11,7 @@
 |[[buyerId]]`@buyerId`|`Number (int)`|-
 |[[id]]`@id`|`Number (int)`|-
 |[[productId]]`@productId`|`Number (int)`|-
+|[[status]]`@status`|`String`|-
+|[[value]]`@value`|`Number (double)`|-
 |===
 

@@ -65,6 +65,22 @@ public class BaseJdbcService {
                 });
     }
 
+    protected Future<List<JsonObject>> fetchMany(JsonArray params, String sql) {
+        return getConnection().compose(connection -> {
+            Promise<List<JsonObject>> promise = Promise.promise();
+            connection.queryWithParams(sql, params, queryResultHandler -> {
+                if (queryResultHandler.succeeded()) {
+                    System.out.println(queryResultHandler.result().getRows());
+                    promise.complete(queryResultHandler.result().getRows());
+                } else {
+                    promise.fail(queryResultHandler.cause());
+                }
+                connection.close();
+            });
+            return promise.future();
+        });
+    }
+
     protected Future<List<JsonObject>> fetchMany(String sql) {
         return getConnection().compose(connection -> {
             Promise<List<JsonObject>> promise = Promise.promise();

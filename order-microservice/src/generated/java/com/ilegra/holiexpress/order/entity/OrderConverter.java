@@ -29,6 +29,16 @@ public class OrderConverter {
             obj.setProductId(((Number)member.getValue()).intValue());
           }
           break;
+        case "status":
+          if (member.getValue() instanceof String) {
+            obj.setStatus((String)member.getValue());
+          }
+          break;
+        case "value":
+          if (member.getValue() instanceof Number) {
+            obj.setValue(((Number)member.getValue()).doubleValue());
+          }
+          break;
       }
     }
   }
@@ -41,5 +51,9 @@ public class OrderConverter {
     json.put("buyerId", obj.getBuyerId());
     json.put("id", obj.getId());
     json.put("productId", obj.getProductId());
+    if (obj.getStatus() != null) {
+      json.put("status", obj.getStatus());
+    }
+    json.put("value", obj.getValue());
   }
 }

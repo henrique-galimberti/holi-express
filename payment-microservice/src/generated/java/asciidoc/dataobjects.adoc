@@ -1,0 +1,15 @@
+= Cheatsheets
+
+[[Payment]]
+== Payment
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`@id`|`String`|-
+|[[orderId]]`@orderId`|`Number (int)`|-
+|[[status]]`@status`|`String`|-
+|===
+

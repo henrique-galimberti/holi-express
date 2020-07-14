@@ -13,15 +13,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OrderServiceImpl extends BaseJdbcService implements OrderService {
-    private static final String CREATE_STATEMENT = "CREATE TABLE IF NOT EXISTS order (\n" +
+    private static final String CREATE_STATEMENT = "CREATE TABLE IF NOT EXISTS orders (\n" +
             "  id SERIAL,\n" +
             "  \"buyerId\" int NOT NULL,\n" +
             "  \"productId\" int NOT NULL,\n" +
+            "  \"value\" decimal NOT NULL,\n" +
             "  PRIMARY KEY (id) )";
-    private static final String INSERT_STATEMENT = "INSERT INTO order (\"buyerId\", \"productId\") VALUES (?, ?)";
-    private static final String FETCH_STATEMENT = "SELECT * FROM order WHERE id = ?";
-    private static final String FETCH_MANY_STATEMENT = "SELECT * FROM order where \"buyerId\" = ?";
-    private static final String DELETE_STATEMENT = "DELETE FROM order WHERE id = ?";
+    private static final String INSERT_STATEMENT = "INSERT INTO orders (\"buyerId\", \"productId\", \"value\") VALUES (?, ?, ?)";
+    private static final String UPDATE_STATEMENT = "UPDATE orders SET status = ? WHERE id = ?";
+    private static final String FETCH_STATEMENT = "SELECT * FROM orders WHERE id = ?";
+    private static final String FETCH_MANY_STATEMENT = "SELECT * FROM orders where \"buyerId\" = ?";
 
     public OrderServiceImpl(Vertx vertx, JsonObject config) {
         super(vertx, config);
@@ -41,11 +42,29 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
     public void addOrder(Order order, Handler<AsyncResult<Void>> resultHandler) {
         JsonArray params = new JsonArray()
                 .add(order.getBuyerId())
-                .add(order.getProductId());
+                .add(order.getProductId())
+                .add(order.getValue());
         insert(params, INSERT_STATEMENT).onComplete(asyncResult -> {
             order.setId(asyncResult.result().getInteger(0));
             resultHandler.handle(Future.succeededFuture());
         });
+    }
+
+    @Override
+    public void notification(JsonObject notification, Handler<AsyncResult<Void>> resultHandler) {
+        String orderId = getOrderIdFromNotification(notification);
+        String newStatus = getNewsStatus(notification);
+        execute(new JsonArray()
+                        .add(orderId)
+                        .add(newStatus),
+                UPDATE_STATEMENT,
+                asyncResult -> {
+                    resultHandler.handle(Future.succeededFuture());
+
+                    if (newStatus.equals(Order.STATUS_CANCELLED)) {
+                        //TODO increase stock
+                    }
+                });
     }
 
     @Override
@@ -57,7 +76,7 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
 
     @Override
     public void retrieveOrders(String buyerId, Handler<AsyncResult<List<Order>>> resultHandler) {
-        this.fetchMany(FETCH_MANY_STATEMENT)
+        this.fetchMany(new JsonArray().add(buyerId), FETCH_MANY_STATEMENT)
                 .map(rawList -> rawList.stream()
                         .map(Order::new)
                         .collect(Collectors.toList())
@@ -65,8 +84,13 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
                 .onComplete(resultHandler);
     }
 
-    @Override
-    public void deleteOrder(String orderId, Handler<AsyncResult<Void>> resultHandler) {
-        this.delete(Integer.parseInt(orderId), DELETE_STATEMENT, resultHandler);
+    private String getOrderIdFromNotification(JsonObject notification) {
+        //should return based on notification
+        return notification.getString("orderId");
+    }
+
+    private String getNewsStatus(JsonObject notification) {
+        //should return based on notification
+        return Order.STATUS_FINISHED;
     }
 }

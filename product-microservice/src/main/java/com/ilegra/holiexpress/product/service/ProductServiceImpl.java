@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class ProductServiceImpl extends BaseJdbcService implements ProductService {
 
-    private static final String CREATE_STATEMENT = "CREATE TABLE IF NOT EXISTS product (\n" +
+    private static final String CREATE_STATEMENT = "CREATE TABLE IF NOT EXISTS products (\n" +
             "  id SERIAL,\n" +
             "  \"sellerId\" int NOT NULL,\n" +
             "  name varchar(255) NOT NULL,\n" +
@@ -22,10 +22,10 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
             "  image text NOT NULL,\n" +
             "  type varchar(45) NOT NULL,\n" +
             "  PRIMARY KEY (id) )";
-    private static final String INSERT_STATEMENT = "INSERT INTO product (\"sellerId\", name, price, image, type) VALUES (?, ?, ?, ?, ?)";
-    private static final String FETCH_STATEMENT = "SELECT * FROM product WHERE id = ?";
-    private static final String FETCH_ALL_STATEMENT = "SELECT * FROM product";
-    private static final String DELETE_STATEMENT = "DELETE FROM product WHERE id = ?";
+    private static final String INSERT_STATEMENT = "INSERT INTO products (\"sellerId\", name, price, image, type) VALUES (?, ?, ?, ?, ?)";
+    private static final String FETCH_STATEMENT = "SELECT * FROM products WHERE id = ?";
+    private static final String FETCH_ALL_STATEMENT = "SELECT * FROM products";
+    private static final String DELETE_STATEMENT = "DELETE FROM products WHERE id = ?";
 
     public ProductServiceImpl(Vertx vertx, JsonObject config) {
         super(vertx, config);

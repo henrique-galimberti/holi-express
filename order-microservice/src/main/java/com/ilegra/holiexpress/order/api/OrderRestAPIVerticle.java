@@ -4,20 +4,25 @@ import com.ilegra.holiexpress.common.RestAPIVerticle;
 import com.ilegra.holiexpress.order.entity.Order;
 import com.ilegra.holiexpress.order.service.OrderService;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.types.HttpEndpoint;
 
 public class OrderRestAPIVerticle extends RestAPIVerticle {
     public static final String SERVICE_NAME = "order";
 
     private static final String API_ADD = "/add";
-    private static final String API_RETRIEVE_FROM_BUYER = "/retrieveFromBuyer/:id";
+    private static final String API_NOTIFICATION = "/notification";
+    private static final String API_RETRIEVE_FROM_BUYER = "/retrieveFromBuyer/:buyerId";
     private static final String API_RETRIEVE = "/retrieve/:id";
-    private static final String API_DELETE = "/delete/:id";
 
     private final OrderService service;
 
@@ -32,10 +37,10 @@ public class OrderRestAPIVerticle extends RestAPIVerticle {
 
         router.route().handler(BodyHandler.create());
 
-        router.post(API_ADD).handler(this::apiAdd);
+        router.post(API_ADD).handler(context -> requireLogin(context, this::apiAdd));
+        router.post(API_NOTIFICATION).handler(this::apiNotification);
         router.get(API_RETRIEVE_FROM_BUYER).handler(this::apiRetrieveFromBuyer);
         router.get(API_RETRIEVE).handler(this::apiRetrieve);
-        router.delete(API_DELETE).handler(this::apiDelete);
 
         String host = config().getString("http.address", "0.0.0.0");
         int port = config().getInteger("http.port", 9000);
@@ -45,34 +50,77 @@ public class OrderRestAPIVerticle extends RestAPIVerticle {
                 .onComplete(endpointPublished -> startPromise.complete());
     }
 
-    private void apiAdd(RoutingContext context) {
+    private void apiAdd(RoutingContext context, JsonObject userPrincipal) {
         try {
             Order order = new Order(new JsonObject(context.getBodyAsString()));
-            service.addOrder(order, resultHandler(context, r -> {
-                String result = new JsonObject().put("message", "order_added")
-                        .put("id", order.getId())
-                        .encodePrettily();
-                context.response().setStatusCode(201)
-                        .putHeader("content-type", "application/json")
-                        .end(result);
-            }));
+
+            //TODO: check if userPrincipal and buyer matches
+
+            getStockEndpoint().future().onComplete(asyncResult -> {
+                HttpClient client = asyncResult.result();
+
+                client.get("/retrieve/" + order.getProductId(), retrieveResponse -> {
+                    if (retrieveResponse.statusCode() == 200) {
+                        retrieveResponse.bodyHandler(body -> {
+                            int currentStock = Integer.parseInt(body.toString());
+
+                            if (currentStock == 0) {
+                                String result = new JsonObject().put("message", "product_out_of_stock")
+                                        .encodePrettily();
+                                context.response().setStatusCode(200)
+                                        .putHeader("content-type", "application/json")
+                                        .end(result);
+
+                                ServiceDiscovery.releaseServiceObject(discovery, client);
+                            } else {
+                                HttpClientRequest request = client.request(HttpMethod.POST, "/decrease", decreseResponse -> {
+                                    ServiceDiscovery.releaseServiceObject(discovery, client);
+
+                                    service.addOrder(order, resultHandler(context, r -> {
+                                        String result = new JsonObject().put("message", "order_added")
+                                                .put("id", order.getId())
+                                                .encodePrettily();
+                                        context.response().setStatusCode(201)
+                                                .putHeader("content-type", "application/json")
+                                                .end(result);
+                                    }));
+                                });
+
+                                request.end(new JsonObject()
+                                        .put("productId", order.getProductId())
+                                        .put("amount", 1)
+                                        .encodePrettily());
+                            }
+                        });
+                    }
+                });
+            });
         } catch (DecodeException e) {
             handleBadRequest(context, e);
         }
     }
 
+    private void apiNotification(RoutingContext context) {
+        service.notification(new JsonObject(context.getBodyAsString()), resultHandler(context, handler -> {
+            context.response().setStatusCode(200).end();
+        }));
+    }
+
     private void apiRetrieve(RoutingContext context) {
-        String orderId = context.request().getParam("id");
+        String orderId = context.request().getParam("orderId");
         service.retrieveOrder(orderId, resultHandlerNonEmpty(context));
     }
 
     private void apiRetrieveFromBuyer(RoutingContext context) {
-        String buyerId = context.request().getParam("id");
+        String buyerId = context.request().getParam("buyerId");
         service.retrieveOrders(buyerId, resultHandler(context, Json::encodePrettily));
     }
 
-    private void apiDelete(RoutingContext context) {
-        String orderId = context.request().getParam("id");
-        service.deleteOrder(orderId, deleteResultHandler(context));
+    private Promise<HttpClient> getStockEndpoint() {
+        Promise<HttpClient> promise = Promise.promise();
+        HttpEndpoint.getClient(discovery,
+                new JsonObject().put("api.name", "stock"),
+                promise);
+        return promise;
     }
 }

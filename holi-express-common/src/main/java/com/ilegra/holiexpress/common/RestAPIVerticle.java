@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class RestAPIVerticle extends BaseMicroserviceVerticle {
@@ -19,6 +21,18 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
                 .requestHandler(router)
                 .listen(port, host, promise);
         return promise.future().map((Void) null);
+    }
+
+    protected void requireLogin(RoutingContext context, BiConsumer<RoutingContext, JsonObject> biHandler) {
+        Optional<JsonObject> principal = Optional.ofNullable(context.request().getHeader("user-principal"))
+                .map(JsonObject::new);
+        if (principal.isPresent()) {
+            biHandler.accept(context, principal.get());
+        } else {
+            context.response()
+                    .setStatusCode(401)
+                    .end(new JsonObject().put("message", "need_auth").encode());
+        }
     }
 
     protected <T> Handler<AsyncResult<T>> resultHandler(RoutingContext context, Handler<T> handler) {

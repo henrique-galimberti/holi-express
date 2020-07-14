@@ -15,6 +15,4 @@ public interface UserService {
     void retrieveUser(String productId, Handler<AsyncResult<User>> resultHandler);
 
     void retrieveAllUsers(Handler<AsyncResult<List<User>>> resultHandler);
-
-    void deleteUser(String userId, Handler<AsyncResult<Void>> resultHandler);
 }

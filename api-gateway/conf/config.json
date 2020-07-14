@@ -12,5 +12,11 @@
     "timeout": 2000,
     "fallback-on-failure": true,
     "reset-timeout": 10000
+  },
+  "jdbc-config": {
+    "url": "jdbc:postgresql://localhost:5432/holiexpress",
+    "driver_class": "org.postgresql.Driver",
+    "user": "postgres",
+    "password": "postgre"
   }
 }

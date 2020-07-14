@@ -5,9 +5,18 @@ import io.vertx.core.json.JsonObject;
 
 @DataObject(generateConverter = true)
 public class Order {
+
+    public static final String STATUS_WAITING_PAYMENT = "waiting_payment";
+    public static final String STATUS_DELIVERING_PROCESS = "delivering_process";
+    public static final String STATUS_FINISHED = "finished";
+    public static final String STATUS_CANCELLED = "cancelled";
+    public static final String STATUS_ERROR = "payment_error";
+
     private int id;
     private int buyerId;
     private int productId;
+    private double value;
+    private String status;
 
     public Order() {
     }
@@ -16,6 +25,8 @@ public class Order {
         this.id = other.id;
         this.buyerId = other.buyerId;
         this.productId = other.productId;
+        this.value = other.value;
+        this.status = other.status;
     }
 
     public Order(JsonObject json) {
@@ -50,6 +61,22 @@ public class Order {
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
