@@ -1,6 +1,6 @@
 {
   "api.name": "payment",
-  "http.address": "0.0.0.0",
+  "http.address": "payment-microservice",
   "http.port": 9002,
   "service-discovery": {
     "host": "redis",

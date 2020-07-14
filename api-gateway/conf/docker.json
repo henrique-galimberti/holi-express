@@ -1,5 +1,5 @@
 {
-  "http.address": "0.0.0.0",
+  "http.address": "api-gateway",
   "http.port": 9000,
   "service-discovery": {
     "host": "redis",

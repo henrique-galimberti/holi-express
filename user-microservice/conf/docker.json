@@ -1,6 +1,6 @@
 {
   "api.name": "user",
-  "http.address": "0.0.0.0",
+  "http.address": "user-microservice",
   "http.port": 9005,
   "service-discovery": {
     "host": "redis",

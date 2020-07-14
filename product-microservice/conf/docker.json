@@ -1,6 +1,6 @@
 {
   "api.name": "product",
-  "http.address": "0.0.0.0",
+  "http.address": "product-microservice",
   "http.port": 9003,
   "service-discovery": {
     "host": "redis",

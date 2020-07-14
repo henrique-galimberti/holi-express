@@ -1,6 +1,6 @@
 {
   "api.name": "order",
-  "http.address": "0.0.0.0",
+  "http.address": "order-microservice",
   "http.port": 9001,
   "service-discovery": {
     "host": "redis",
