@@ -10,7 +10,7 @@ The solution is splitted in tiny microservices, with each one being responsible 
 single entity operations. Every microservice consists of a main Verticle that deploys a REST 
 endpoint and registers it on service discovery.
 
-Every API call will go through an API Gateway, which is currently responsible for: 
+Every API call goes through an API Gateway, which is currently responsible for: 
 * Very simple Load Balancing 
 * Fault Tolerance (through circuit-breaker)
 * Service Discovery
@@ -179,11 +179,11 @@ way of thinking, your java knowledge, libs and frameworks
  that you use, your architectural choices and software design skills."
 
 So, in this project it was aimed to fulfill the base requirements as well as 
-showing the skills described in instructions.
+showing the skills described in the instructions.
 
 That being said, there are several features that were not addressed in this solution, as per example:
 * RDBMS otimizations (indexes, foreign keys, ...)
-* Complementary fields for entities (such as address for users, description for products and so on)
+* Complementary fields for entities (such as address and email for users, description for products and so on)
 * Front-end ;)
 * Payment and delivery integration (which will lead to a never completing order)
 * Other (maybe essential) features for an e-commerce that were not in the base requirements
