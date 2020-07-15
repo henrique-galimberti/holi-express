@@ -22,8 +22,8 @@ The stack used in this project contains:
 * PostgreSQL
 * Redis
 * Gradle
-* JUnit
-* Docker
+* JUnit/Mockito/Powermock
+* Docker/Docker Compose
 
 ## Usage (Base Requirements + User Stories)
 #### Register user (Base Requirement):

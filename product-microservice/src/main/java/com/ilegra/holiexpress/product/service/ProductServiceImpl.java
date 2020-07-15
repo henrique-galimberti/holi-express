@@ -103,7 +103,7 @@ public class ProductServiceImpl extends BaseJdbcService implements ProductServic
                                         }
                                     }
 
-                                    return referenceWords.size() - tempReferenceWords.size();
+                                    return tempReferenceWords.size() - referenceWords.size();
                                 }));
 
                         List<Product> similarProducts = asyncResult.result()

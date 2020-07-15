@@ -9,7 +9,7 @@ public class Payment {
     public static final String STATUS_FINISHED = "finished";
     public static final String STATUS_ERROR = "error";
 
-    private String checkoutId;
+    private String transactionId;
     private int orderId;
     private String status;
 
@@ -17,7 +17,7 @@ public class Payment {
     }
 
     public Payment(Payment other) {
-        this.checkoutId = other.checkoutId;
+        this.transactionId = other.transactionId;
         this.orderId = other.orderId;
         this.status = other.status;
     }
@@ -32,12 +32,12 @@ public class Payment {
         return json;
     }
 
-    public String getId() {
-        return checkoutId;
+    public String getTransactionId() {
+        return transactionId;
     }
 
-    public void setId(String id) {
-        this.checkoutId = checkoutId;
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public int getOrderId() {
@@ -63,12 +63,12 @@ public class Payment {
 
         Payment payment = (Payment) o;
 
-        return checkoutId.equals(payment.checkoutId);
+        return transactionId.equals(payment.transactionId);
     }
 
     @Override
     public int hashCode() {
-        return checkoutId.hashCode();
+        return transactionId.hashCode();
     }
 
     @Override

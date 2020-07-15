@@ -19,7 +19,7 @@ public class BaseJdbcService {
     protected final JDBCClient client;
 
     public BaseJdbcService(Vertx vertx, JsonObject config) {
-        this.client = JDBCClient.create(vertx, config.getJsonObject("jdbc-config"));
+        this.client = JDBCClient.create(vertx, config.getJsonObject("jdbc-config", new JsonObject()));
     }
 
     protected void execute(JsonArray params, String sql, Handler<AsyncResult<Void>> resultHandler) {
@@ -78,7 +78,6 @@ public class BaseJdbcService {
             Promise<List<JsonObject>> promise = Promise.promise();
             connection.queryWithParams(sql, params, queryResultHandler -> {
                 if (queryResultHandler.succeeded()) {
-                    System.out.println(queryResultHandler.result().getRows());
                     promise.complete(queryResultHandler.result().getRows());
                 } else {
                     LOGGER.error("Failed to fetch query result", queryResultHandler.cause());
@@ -95,7 +94,6 @@ public class BaseJdbcService {
             Promise<List<JsonObject>> promise = Promise.promise();
             connection.query(sql, queryResultHandler -> {
                 if (queryResultHandler.succeeded()) {
-                    System.out.println(queryResultHandler.result().getRows());
                     promise.complete(queryResultHandler.result().getRows());
                 } else {
                     LOGGER.error("Failed to fetch query result", queryResultHandler.cause());

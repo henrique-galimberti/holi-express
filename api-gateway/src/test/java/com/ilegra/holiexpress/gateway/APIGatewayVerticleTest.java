@@ -1,34 +1,40 @@
 package com.ilegra.holiexpress.gateway;
 
 import io.vertx.core.Vertx;
-import io.vertx.junit5.VertxExtension;
-import io.vertx.junit5.VertxTestContext;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-
-@ExtendWith(VertxExtension.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(VertxUnitRunner.class)
 public class APIGatewayVerticleTest {
 
-    @Test
-    public void start_verticle() throws Throwable {
-        Vertx vertx = Vertx.vertx();
+    private String deploymentId;
 
-        VertxTestContext testContext = new VertxTestContext();
+    @Test
+    public void start_stop(TestContext testContext) {
+        Vertx vertx = Vertx.vertx();
 
         APIGatewayVerticle verticle = new APIGatewayVerticle();
 
-        vertx.deployVerticle(verticle, testContext.completing());
+        Async asyncStart = testContext.async();
+        vertx.deployVerticle(verticle, asyncResult -> {
+            testContext.assertTrue(asyncResult.succeeded());
+            deploymentId = asyncResult.result();
+            asyncStart.complete();
+        });
+        asyncStart.await(5000);
 
-        assertTrue(testContext.awaitCompletion(5, TimeUnit.SECONDS));
-
-        if (testContext.failed()) {
-            throw testContext.causeOfFailure();
-        }
+        Async asyncStop = testContext.async();
+        vertx.undeploy(deploymentId, asyncResult -> {
+            testContext.assertTrue(asyncResult.succeeded());
+            asyncStop.complete();
+        });
+        asyncStop.await(5000);
     }
 }
 

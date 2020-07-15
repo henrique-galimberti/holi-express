@@ -46,7 +46,6 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
                 handler.handle(asyncResult.result());
             } else {
                 handleInternalError(context, asyncResult.cause());
-                asyncResult.cause().printStackTrace();
             }
         };
     }
@@ -64,7 +63,6 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
                 }
             } else {
                 handleInternalError(context, asyncResult.cause());
-                asyncResult.cause().printStackTrace();
             }
         };
     }
@@ -82,7 +80,6 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
                 }
             } else {
                 handleInternalError(context, asyncResult.cause());
-                asyncResult.cause().printStackTrace();
             }
         };
     }

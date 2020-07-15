@@ -14,11 +14,6 @@ public class PaymentConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, Payment obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
-        case "id":
-          if (member.getValue() instanceof String) {
-            obj.setId((String)member.getValue());
-          }
-          break;
         case "orderId":
           if (member.getValue() instanceof Number) {
             obj.setOrderId(((Number)member.getValue()).intValue());
@@ -27,6 +22,11 @@ public class PaymentConverter {
         case "status":
           if (member.getValue() instanceof String) {
             obj.setStatus((String)member.getValue());
+          }
+          break;
+        case "transactionId":
+          if (member.getValue() instanceof String) {
+            obj.setTransactionId((String)member.getValue());
           }
           break;
       }
@@ -38,12 +38,12 @@ public class PaymentConverter {
   }
 
   public static void toJson(Payment obj, java.util.Map<String, Object> json) {
-    if (obj.getId() != null) {
-      json.put("id", obj.getId());
-    }
     json.put("orderId", obj.getOrderId());
     if (obj.getStatus() != null) {
       json.put("status", obj.getStatus());
+    }
+    if (obj.getTransactionId() != null) {
+      json.put("transactionId", obj.getTransactionId());
     }
   }
 }

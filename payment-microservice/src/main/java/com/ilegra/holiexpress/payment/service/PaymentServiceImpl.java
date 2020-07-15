@@ -40,7 +40,7 @@ public class PaymentServiceImpl extends BaseJdbcService implements PaymentServic
     @Override
     public void addPayment(Payment payment, Handler<AsyncResult<Void>> resultHandler) {
         JsonArray params = new JsonArray()
-                .add(payment.getId())
+                .add(payment.getTransactionId())
                 .add(payment.getOrderId())
                 .add(Payment.STATUS_PENDING);
         insert(params, INSERT_STATEMENT).onComplete(asyncResult -> {

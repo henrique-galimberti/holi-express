@@ -18,8 +18,9 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
             "  \"buyerId\" int NOT NULL,\n" +
             "  \"productId\" int NOT NULL,\n" +
             "  \"value\" decimal NOT NULL,\n" +
+            "  status decimal NOT NULL,\n" +
             "  PRIMARY KEY (id) )";
-    private static final String INSERT_STATEMENT = "INSERT INTO orders (\"buyerId\", \"productId\", \"value\") VALUES (?, ?, ?)";
+    private static final String INSERT_STATEMENT = "INSERT INTO orders (\"buyerId\", \"productId\", \"value\", status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_STATEMENT = "UPDATE orders SET status = ? WHERE id = ?";
     private static final String FETCH_STATEMENT = "SELECT * FROM orders WHERE id = ?";
     private static final String FETCH_MANY_STATEMENT = "SELECT * FROM orders where \"buyerId\" = ?";
@@ -43,7 +44,8 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
         JsonArray params = new JsonArray()
                 .add(order.getBuyerId())
                 .add(order.getProductId())
-                .add(order.getValue());
+                .add(order.getValue())
+                .add(Order.STATUS_WAITING_PAYMENT);
         insert(params, INSERT_STATEMENT).onComplete(asyncResult -> {
             order.setId(asyncResult.result().getInteger(0));
             resultHandler.handle(Future.succeededFuture());
