@@ -17,7 +17,7 @@ public class PaymentServiceImpl extends BaseJdbcService implements PaymentServic
             "  \"transactionId\" varchar(255) NOT NULL,\n" +
             "  \"orderId\" int NOT NULL,\n" +
             "  status varchar(255) NOT NULL,\n" +
-            "  PRIMARY KEY (id) )";
+            "  PRIMARY KEY (\"transactionId\") )";
     private static final String INSERT_STATEMENT = "INSERT INTO payments (\"transactionId\", \"orderId\", status) VALUES (?, ?, ?)";
     private static final String UPDATE_STATEMENT = "UPDATE payments SET status = ? WHERE \"transactionId\" = ?";
     private static final String FETCH_STATEMENT = "SELECT * FROM payments WHERE \"transactionId\" = ?";

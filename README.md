@@ -45,6 +45,9 @@ RESPONSE:
   "id": 5
 }
 ```
+EXPLANATION:
+This is a straight forward method. It just stores the user.
+The only validation done here is username uniqueness.
 #### Register product (Base Requirement):
 REQUEST:
 ```sh
@@ -53,11 +56,14 @@ Content-Type: application/json
 Cookie: vertx-web.session=6944d0ccd5c7a4cf6e15f59c1f4a1792
 
 {
-    "image": "data:image/png;base64,iVBORw0KGgoAAAA...",
-    "name": "Cafeteira Oster",
-    "price": 999.99,
-    "sellerId": 1,
-    "type": "Eletrodoméstico"
+    "product": {
+        "image": "data:image/png;base64,iVBORw0KGgoAAAA...",
+        "name": "Cafeteira Oster Prima Latte 2",
+        "price": 950.00,
+        "sellerId": 1,
+        "type": "Eletrodoméstico"
+    },
+    "stock": 5
 }
 ```
 RESPONSE:
@@ -67,9 +73,34 @@ RESPONSE:
   "id": 2
 }
 ```
+EXPLANATION:
+This method will store the product and 
+then call stock microservice to update the product stock.
+It also requires previous authentication.
 #### Buy product (Base Requirement):
+```sh
+POST /api/order/add HTTP/1.1
+Content-Type: application/json
+Cookie: vertx-web.session=bcbf269ccb8b174727b919dbbf1bb315
 
-
+{
+    "buyerId": 1,
+    "productId": 10,
+    "value": 999.99
+}
+```
+RESPONSE:
+```sh
+{
+  "message": "product_out_of_stock"
+}
+```
+EXPLANATION:
+The method simply registers an order with a 'payment_pending' state.
+In order for it to advance in its flow, it would be necessary to register
+a payment, then the payment api would notify our microservice and it would then
+notify the order to advance to delivery state (which would also need a notification to then complete the order).
+It also validates product stock (and decreases it in every order). 
 #### Compare prices (User Story #2):
 ```sh
 GET /api/product/compare HTTP/1.1
@@ -105,6 +136,10 @@ RESPONSE:
   }
 ]
 ```
+EXPLANATION:
+The method fetches some products with the same type of our product (param) and lower price.
+It then sorts then by number of matching words with our product name.
+Before returning, it limits our result to 10 products. 
 #### Authentication (User Story #5):
 REQUEST:
 ```sh
@@ -133,6 +168,8 @@ RESPONSE (failure):
   "error": "Invalid username/password"
 }
 ```
+EXPLANATION:
+A simple JDBCAuth.
 
 ## Disclaimer
 As per instructions:
@@ -155,12 +192,12 @@ That being said, there are several features that were not addressed in this solu
 ## Progress
 ![api-gateway](https://progress-bar.dev/100?title=api-gateway)
 ![product-microservice](https://progress-bar.dev/100?title=product-microservice)
-![order-microservice](https://progress-bar.dev/80?title=order-microservice)
+![order-microservice](https://progress-bar.dev/100?title=order-microservice)
 ![user-microservice](https://progress-bar.dev/100?title=user-microservice)
-![payment-microservice](https://progress-bar.dev/80?title=payment-microservice)
+![payment-microservice](https://progress-bar.dev/100?title=payment-microservice)
 ![authorization-service](https://progress-bar.dev/100?title=authorization-service)
 ![redis-cache](https://progress-bar.dev/0?title=redis-cache)
 ![docker](https://progress-bar.dev/80?title=docker)
 ![logging](https://progress-bar.dev/100?title=logging)
 ![monitoring](https://progress-bar.dev/0?title=monitoring)
-![tests](https://progress-bar.dev/0?title=tests)
+![tests](https://progress-bar.dev/5?title=tests)

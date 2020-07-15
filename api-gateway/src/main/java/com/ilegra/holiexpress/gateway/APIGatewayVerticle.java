@@ -47,7 +47,10 @@ public class APIGatewayVerticle extends RestAPIVerticle {
                         .setResetTimeout(circuitBreakerConfig.getLong("reset-timeout", 10000L))
         );
 
-        authProvider = JDBCAuth.create(vertx, JDBCClient.create(vertx, config().getJsonObject("jdbc-config")));
+        JsonObject jdbcConfig = config().getJsonObject("jdbc-config") != null ?
+                config().getJsonObject("jdbc-config") : new JsonObject();
+
+        authProvider = JDBCAuth.create(vertx, JDBCClient.create(vertx, jdbcConfig));
 
         authProvider.setAuthenticationQuery("SELECT password, password_salt FROM users WHERE username = ?");
 

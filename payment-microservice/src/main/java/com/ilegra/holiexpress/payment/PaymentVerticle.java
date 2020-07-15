@@ -16,8 +16,8 @@ public class PaymentVerticle extends BaseMicroserviceVerticle {
 
         PaymentService paymentService = new PaymentServiceImpl(vertx, config());
 
-        deployRestService(paymentService)
-                .onComplete(restDeployed -> startPromise.complete());
+        paymentService.initializePersistence(persistenceInitialized -> deployRestService(paymentService)
+                .onComplete(restDeployed -> startPromise.complete()));
     }
 
     private Future<Void> deployRestService(PaymentService service) {

@@ -1,7 +1,7 @@
 {
   "api.name": "stock",
   "http.address": "0.0.0.0",
-  "http.port": 9004,
+  "http.port": 9010,
   "redis-connection": "redis://localhost:6379",
   "service-discovery": {
     "host": "localhost",

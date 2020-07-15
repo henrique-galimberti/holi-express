@@ -4,12 +4,17 @@ import com.ilegra.holiexpress.common.RestAPIVerticle;
 import com.ilegra.holiexpress.product.entity.Product;
 import com.ilegra.holiexpress.product.service.ProductService;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.types.HttpEndpoint;
 
 public class ProductRestAPIVerticle extends RestAPIVerticle {
 
@@ -48,15 +53,36 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
 
     private void apiAdd(RoutingContext context, JsonObject userPrincipal) {
         try {
+            JsonObject body = new JsonObject(context.getBodyAsString());
+            Product product = new Product(body.getJsonObject("product"));
+            int stock = body.getInteger("stock");
+
             //TODO verify if sellerId matches userPrincipal
-            Product product = new Product(new JsonObject(context.getBodyAsString()));
+
             service.addProduct(product, resultHandler(context, r -> {
-                String result = new JsonObject().put("message", "product_added")
-                        .put("id", product.getId())
-                        .encodePrettily();
-                context.response().setStatusCode(201)
-                        .putHeader("content-type", "application/json")
-                        .end(result);
+                getStockEndpoint().future().onComplete(asyncResult -> {
+                    HttpClient client = asyncResult.result();
+
+                    HttpClientRequest request = client.request(HttpMethod.POST, "/increase", retrieveResponse -> {
+                        if (retrieveResponse.statusCode() == 200) {
+                            String result = new JsonObject().put("message", "product_added")
+                                    .put("id", product.getId())
+                                    .encodePrettily();
+                            context.response().setStatusCode(201)
+                                    .putHeader("content-type", "application/json")
+                                    .end(result);
+                        } else {
+                            handleInternalError(context, new Exception("Unable to increase stock"));
+                        }
+
+                        ServiceDiscovery.releaseServiceObject(discovery, client);
+                    });
+
+                    request.end(new JsonObject()
+                            .put("productId", String.valueOf(product.getId()))
+                            .put("amount", String.valueOf(stock))
+                            .encodePrettily());
+                });
             }));
         } catch (DecodeException e) {
             handleBadRequest(context, e);
@@ -79,5 +105,13 @@ public class ProductRestAPIVerticle extends RestAPIVerticle {
         } catch (DecodeException e) {
             handleBadRequest(context, e);
         }
+    }
+
+    private Promise<HttpClient> getStockEndpoint() {
+        Promise<HttpClient> promise = Promise.promise();
+        HttpEndpoint.getClient(discovery,
+                new JsonObject().put("api.name", "stock"),
+                promise);
+        return promise;
     }
 }

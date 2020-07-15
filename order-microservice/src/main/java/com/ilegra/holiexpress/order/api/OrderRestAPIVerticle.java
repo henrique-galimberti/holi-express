@@ -59,7 +59,7 @@ public class OrderRestAPIVerticle extends RestAPIVerticle {
             getStockEndpoint().future().onComplete(asyncResult -> {
                 HttpClient client = asyncResult.result();
 
-                client.get("/retrieve/" + order.getProductId(), retrieveResponse -> {
+                client.request(HttpMethod.GET, "/retrieve/" + order.getProductId(), retrieveResponse -> {
                     if (retrieveResponse.statusCode() == 200) {
                         retrieveResponse.bodyHandler(body -> {
                             int currentStock = Integer.parseInt(body.toString());
@@ -87,13 +87,13 @@ public class OrderRestAPIVerticle extends RestAPIVerticle {
                                 });
 
                                 request.end(new JsonObject()
-                                        .put("productId", order.getProductId())
-                                        .put("amount", 1)
+                                        .put("productId", String.valueOf(order.getProductId()))
+                                        .put("amount", "1")
                                         .encodePrettily());
                             }
                         });
                     }
-                });
+                }).end();
             });
         } catch (DecodeException e) {
             handleBadRequest(context, e);
