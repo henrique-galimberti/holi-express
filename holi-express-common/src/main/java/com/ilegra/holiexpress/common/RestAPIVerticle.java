@@ -112,4 +112,9 @@ public class RestAPIVerticle extends BaseMicroserviceVerticle {
                 .end(new JsonObject().put("error", "bad gateway")
                         .encodePrettily());
     }
+
+    protected void logger(RoutingContext context) {
+        LOGGER.info("Request received: PATH=[" + context.normalisedPath() + "]");
+        context.next();
+    }
 }

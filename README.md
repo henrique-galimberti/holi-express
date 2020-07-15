@@ -6,12 +6,12 @@ need to build a high scalable, reliable and high performance platform. So we are
 help building this solution.
 
 ## Architecture
-The solution will be splitted in tiny microservices which will be responsible for processing 
-single entities operations. Every microservice consists of a main Verticle that deploys a REST 
+The solution is splitted in tiny microservices, with each one being responsible for processing 
+single entity operations. Every microservice consists of a main Verticle that deploys a REST 
 endpoint and registers it on service discovery.
 
 Every API call will go through an API Gateway, which is currently responsible for: 
-* Load Balancing 
+* Very simple Load Balancing 
 * Fault Tolerance (through circuit-breaker)
 * Service Discovery
 * Authentication and Session Handling
@@ -197,7 +197,7 @@ That being said, there are several features that were not addressed in this solu
 ![payment-microservice](https://progress-bar.dev/100?title=payment-microservice)
 ![authorization-service](https://progress-bar.dev/100?title=authorization-service)
 ![redis-cache](https://progress-bar.dev/0?title=redis-cache)
-![docker](https://progress-bar.dev/80?title=docker)
+![docker](https://progress-bar.dev/100?title=docker)
 ![logging](https://progress-bar.dev/100?title=logging)
 ![monitoring](https://progress-bar.dev/0?title=monitoring)
-![tests](https://progress-bar.dev/5?title=tests)
+![tests](https://progress-bar.dev/100?title=tests)

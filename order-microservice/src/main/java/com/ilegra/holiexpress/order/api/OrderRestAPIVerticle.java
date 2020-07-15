@@ -36,6 +36,7 @@ public class OrderRestAPIVerticle extends RestAPIVerticle {
         final Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());
+        router.route().handler(this::logger);
 
         router.post(API_ADD).handler(context -> requireLogin(context, this::apiAdd));
         router.post(API_NOTIFICATION).handler(this::apiNotification);

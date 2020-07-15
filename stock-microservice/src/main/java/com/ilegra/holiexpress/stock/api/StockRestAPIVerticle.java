@@ -30,6 +30,7 @@ public class StockRestAPIVerticle extends RestAPIVerticle {
         final Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());
+        router.route().handler(this::logger);
 
         router.post(API_INCREASE).handler(this::apiIncreaseBy);
         router.post(API_DECREASE).handler(this::apiDecreaseBy);

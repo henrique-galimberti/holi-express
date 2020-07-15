@@ -78,11 +78,11 @@ public class BaseMicroserviceVerticle extends AbstractVerticle {
 
         discovery.publish(record, asyncResult -> {
             if (asyncResult.succeeded()) {
-                LOGGER.info("Service {" + record.getName() + "} has been published");
+                LOGGER.info("Service [" + record.getName() + "] has been published");
                 registeredRecords.add(record);
                 promise.complete();
             } else {
-                LOGGER.error("Failed to publish service {" + record.getName() + "}", asyncResult.cause());
+                LOGGER.error("Failed to publish service [" + record.getName() + "]", asyncResult.cause());
                 promise.fail(asyncResult.cause());
             }
         });

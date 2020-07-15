@@ -34,6 +34,7 @@ public class PaymentRestAPIVerticle extends RestAPIVerticle {
         final Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());
+        router.route().handler(this::logger);
 
         router.post(API_ADD).handler(this::apiAdd);
         router.post(API_NOTIFICATION).handler(this::apiNotification);

@@ -60,6 +60,7 @@ public class APIGatewayVerticle extends RestAPIVerticle {
         Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());
+        router.route().handler(this::logger);
         router.route().handler(SessionHandler.create(
                 LocalSessionStore.create(vertx, "holiexpress.session")));
 

@@ -31,6 +31,7 @@ public class UserRestAPIVerticle extends RestAPIVerticle {
         final Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());
+        router.route().handler(this::logger);
 
         router.post(API_ADD).handler(this::apiAdd);
         router.get(API_RETRIEVE_ALL).handler(this::apiRetrieveAll);
