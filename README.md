@@ -29,6 +29,15 @@ The stack used in this project contains:
 No monitoring dashboard/report was implemented, but there is a very simple page that displays
 the metrics, which can be accessed through /monitor.html.
 
+## How to Run
+```sh
+sh gradlew buildFatJars
+cd docker
+sh build.sh
+sh run.sh
+```
+The API Gateway is served by default at https://localhost:9000
+
 ## Usage (Base Requirements + User Stories)
 #### Register user (Base Requirement):
 REQUEST:

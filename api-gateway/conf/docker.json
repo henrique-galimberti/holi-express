@@ -9,9 +9,9 @@
   "circuit-breaker": {
     "name": "circuit-breaker",
     "max-failures": 5,
-    "timeout": 2000,
+    "timeout": 10000,
     "fallback-on-failure": true,
-    "reset-timeout": 10000
+    "reset-timeout": 20000
   },
   "jdbc-config": {
     "url": "jdbc:postgresql://postgres:5432/holiexpress",
