@@ -2,7 +2,7 @@
   "api.name": "stock",
   "http.address": "stock-microservice",
   "http.port": 9004,
-  "redis-connection": "redis://redis:6379",
+  "redis.connection": "redis://redis:6379",
   "service-discovery": {
     "host": "redis",
     "port": 6379,
