@@ -18,7 +18,7 @@ public class OrderServiceImpl extends BaseJdbcService implements OrderService {
             "  \"buyerId\" int NOT NULL,\n" +
             "  \"productId\" int NOT NULL,\n" +
             "  \"value\" decimal NOT NULL,\n" +
-            "  status decimal NOT NULL,\n" +
+            "  status varchar(255) NOT NULL,\n" +
             "  PRIMARY KEY (id) )";
     private static final String INSERT_STATEMENT = "INSERT INTO orders (\"buyerId\", \"productId\", \"value\", status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_STATEMENT = "UPDATE orders SET status = ? WHERE id = ?";
