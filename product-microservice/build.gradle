@@ -19,6 +19,7 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-codegen', version: '3.9.1'
     compile group: 'io.vertx', name: 'vertx-lang-js', version: '3.9.1'
     compile group: 'io.vertx', name: 'vertx-service-discovery-backend-redis', version: '3.9.1'
+    compile group: 'io.vertx', name: 'vertx-rx-java2', version: '3.9.1'
     annotationProcessor group: 'io.vertx', name: 'vertx-codegen', version: '3.9.1'
     testCompile group: 'io.vertx', name: 'vertx-web-client', version: '3.9.1'
     testCompile group: 'io.vertx', name: 'vertx-junit5', version: '3.9.1'

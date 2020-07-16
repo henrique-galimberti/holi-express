@@ -19,6 +19,7 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-service-discovery-backend-redis', version: '3.9.1'
     compile group: 'io.vertx', name: 'vertx-auth-jdbc', version: '3.9.1'
     compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.9.1'
+    compile group: 'io.vertx', name: 'vertx-dropwizard-metrics', version: '3.9.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
     testCompile group: 'io.vertx', name: 'vertx-junit5', version: '3.9.1'
     testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.9.1'

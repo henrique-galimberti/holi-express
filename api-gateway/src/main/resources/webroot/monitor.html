@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor</title>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: navy; }
+
+
+    </style>
+    <script src="jquery.js"></script>
+    <script src="sockjs.js"></script>
+    <script src="event-bus.js"></script>
+    <script>
+
+        function output(inp) {
+            document.body.innerHTML = '';
+            document.body.appendChild(document.createElement('pre')).innerHTML = inp;
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        var eb = new EventBus("/eventbus/");
+        eb.onopen = function () {
+            eb.registerHandler("vertx.metrics", function (err, msg) {
+                output(syntaxHighlight(JSON.stringify(msg.body,undefined,4)));
+            });
+        };
+
+
+    </script>
+</head>
+<body>
+Waiting for metrics...
+</body>
+</html>

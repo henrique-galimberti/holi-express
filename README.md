@@ -15,6 +15,7 @@ Every API call goes through an API Gateway, which is currently responsible for:
 * Fault Tolerance (through circuit-breaker)
 * Service Discovery
 * Authentication and Session Handling
+* Metrics
 
 The stack used in this project contains:
 * Java
@@ -24,6 +25,9 @@ The stack used in this project contains:
 * Gradle
 * JUnit/Mockito/Powermock
 * Docker/Docker Compose
+
+No monitoring dashboard/report was implemented, but there is a very simple page that displays
+the metrics, which can be accessed through /monitor.html.
 
 ## Usage (Base Requirements + User Stories)
 #### Register user (Base Requirement):
@@ -196,8 +200,7 @@ That being said, there are several features that were not addressed in this solu
 ![user-microservice](https://progress-bar.dev/100?title=user-microservice)
 ![payment-microservice](https://progress-bar.dev/100?title=payment-microservice)
 ![authorization-service](https://progress-bar.dev/100?title=authorization-service)
-![redis-cache](https://progress-bar.dev/0?title=redis-cache)
 ![docker](https://progress-bar.dev/100?title=docker)
 ![logging](https://progress-bar.dev/100?title=logging)
-![monitoring](https://progress-bar.dev/0?title=monitoring)
+![monitoring](https://progress-bar.dev/100?title=monitoring)
 ![tests](https://progress-bar.dev/100?title=tests)

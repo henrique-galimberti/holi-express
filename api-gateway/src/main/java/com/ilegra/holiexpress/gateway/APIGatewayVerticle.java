@@ -5,19 +5,29 @@ import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.JksOptions;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
+import io.vertx.ext.bridge.PermittedOptions;
+import io.vertx.ext.dropwizard.DropwizardMetricsOptions;
+import io.vertx.ext.dropwizard.MetricsService;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.SessionHandler;
+import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
@@ -35,6 +45,10 @@ public class APIGatewayVerticle extends RestAPIVerticle {
     @Override
     public void start(Promise<Void> startPromise) {
         super.start();
+
+        Vertx vertx = Vertx.vertx(new VertxOptions().setMetricsOptions(
+                new DropwizardMetricsOptions().setEnabled(true)
+        ));
 
         JsonObject circuitBreakerConfig = config().getJsonObject("circuit-breaker") != null ?
                 config().getJsonObject("circuit-breaker") : new JsonObject();
@@ -61,6 +75,7 @@ public class APIGatewayVerticle extends RestAPIVerticle {
 
         router.route().handler(BodyHandler.create());
         router.route().handler(this::logger);
+        router.route("/*").handler(StaticHandler.create());
         router.route().handler(SessionHandler.create(
                 LocalSessionStore.create(vertx, "holiexpress.session")));
 
@@ -68,7 +83,20 @@ public class APIGatewayVerticle extends RestAPIVerticle {
         router.post("/logout").handler(this::logoutHandler);
         router.route("/api/*").handler(this::dispatchRequests);
 
-        vertx.createHttpServer()
+        SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
+        SockJSBridgeOptions options = new SockJSBridgeOptions()
+                .addOutboundPermitted(new PermittedOptions().setAddress("vertx.metrics"));
+
+        sockJSHandler.bridge(options);
+        router.route("/eventbus/*").handler(sockJSHandler);
+
+        MetricsService metricsService = MetricsService.create(vertx);
+
+        HttpServerOptions httpServerOptions = new HttpServerOptions()
+                .setSsl(true)
+                .setKeyStoreOptions(new JksOptions().setPath("keystore.jks").setPassword("666666"));
+
+        vertx.createHttpServer(httpServerOptions)
                 .requestHandler(router)
                 .listen(port, host, asyncResult -> {
                     if (asyncResult.succeeded()) {
@@ -78,6 +106,11 @@ public class APIGatewayVerticle extends RestAPIVerticle {
                         startPromise.fail(asyncResult.cause());
                     }
                 });
+
+        vertx.setPeriodic(5000, t -> {
+            JsonObject metrics = metricsService.getMetricsSnapshot(vertx);
+            vertx.eventBus().publish("vertx.metrics", metrics);
+        });
     }
 
     private void dispatchRequests(RoutingContext context) {

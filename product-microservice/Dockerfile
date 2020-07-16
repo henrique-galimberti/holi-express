@@ -9,4 +9,4 @@ COPY conf/docker.json $MICROSERVICE_HOME/
 
 WORKDIR $MICROSERVICE_HOME
 ENTRYPOINT ["sh", "-c"]
-CMD ["java -jar product-microservice-0.0.1-SNAPSHOT.jar run com.ilegra.holiexpress.product.ProductVerticle -conf docker.json"]
+CMD ["java -Dfile.encoding=UTF8 -jar product-microservice-0.0.1-SNAPSHOT.jar run com.ilegra.holiexpress.product.ProductVerticle -conf docker.json"]
